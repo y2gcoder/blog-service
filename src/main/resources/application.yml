@@ -1,0 +1,13 @@
+spring:
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        default_batch_fetch_size: 1000
+logging:
+  level:
+    com.y2gcoder.blog: debug
+    org.hibernate.sql: info
+    org.hibernate.type.descriptor.sql: trace
