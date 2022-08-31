@@ -2,6 +2,7 @@ package com.y2gcoder.blog.entity.article;
 
 import com.y2gcoder.blog.entity.category.Category;
 import com.y2gcoder.blog.entity.common.BaseTimeEntity;
+import com.y2gcoder.blog.entity.member.Member;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,11 +29,16 @@ public class Article extends BaseTimeEntity {
 	@JoinColumn(name = "category_id")
 	private Category category;
 
-	public Article(String title, String content, String thumbnailUrl, Category category) {
+	@ManyToOne
+	@JoinColumn(name = "member_id")
+	private Member member;
+
+	public Article(String title, String content, String thumbnailUrl, Category category, Member member) {
 		this.title = title;
 		this.content = content;
 		this.thumbnailUrl = thumbnailUrl;
 		this.category = category;
+		this.member = member;
 	}
 
 	public void changeCategory(Category category) {
