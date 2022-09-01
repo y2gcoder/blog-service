@@ -29,4 +29,8 @@ public class Member extends BaseTimeEntity {
 		this.role = role;
 	}
 
+	public void changeRole(MemberRole role) {
+		this.role = role;
+	}
+
 }

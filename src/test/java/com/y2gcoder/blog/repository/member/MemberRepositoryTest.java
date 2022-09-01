@@ -8,6 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.dao.DataIntegrityViolationException;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -16,6 +19,9 @@ class MemberRepositoryTest {
 
 	@Autowired
 	MemberRepository memberRepository;
+
+	@PersistenceContext
+	EntityManager em;
 
 	@Test
 	@DisplayName("Member: 저장 성공")
@@ -36,6 +42,23 @@ class MemberRepositoryTest {
 		//when
 		//then
 		assertThatThrownBy(() -> memberRepository.save(createMember())).isInstanceOf(DataIntegrityViolationException.class);
+	}
+
+	@Test
+	@DisplayName("Member: 권한 변경 성공")
+	void changeRole_Normal_Success() {
+		//given
+		Member member = memberRepository.save(createMember());
+		em.flush();
+		em.clear();
+		//when
+		Member findMember = memberRepository.findById(member.getId()).get();
+		findMember.changeRole(MemberRole.ROLE_ADMIN);
+		em.flush();
+		em.clear();
+		//then
+		Member result = memberRepository.findById(member.getId()).get();
+		assertThat(result.getRole()).isEqualTo(MemberRole.ROLE_ADMIN);
 	}
 
 	private static Member createMember() {
