@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.springframework.validation.BindException;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Getter
@@ -23,5 +24,9 @@ public class ApiResponse {
 
 	public static ApiResponse failure(int code, String msg) {
 		return new ApiResponse(false, code, new ApiFailure(msg));
+	}
+
+	public static ApiResponse failure(int code, BindException e) {
+		return new ApiResponse(false, code, ValidationResult.create(e));
 	}
 }

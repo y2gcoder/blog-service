@@ -101,7 +101,7 @@ class AuthServiceTest {
 		//when
 		//then
 		assertThatThrownBy(() -> authService.signIn(createSignInRequest()))
-				.isInstanceOf(IllegalArgumentException.class);
+				.isInstanceOf(SignInFailureException.class);
 	}
 
 	@Test
@@ -114,7 +114,7 @@ class AuthServiceTest {
 		//when
 		//then
 		assertThatThrownBy(() -> authService.signIn(createSignInRequest()))
-				.isInstanceOf(IllegalArgumentException.class);
+				.isInstanceOf(SignInFailureException.class);
 	}
 
 	private static Member createMember() {

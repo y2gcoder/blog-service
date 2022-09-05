@@ -28,14 +28,14 @@ public class AuthService {
 
 	private void validateSignUpInfo(SignUpRequest req) {
 		if(memberRepository.existsByEmail(req.getEmail())) {
-			throw new IllegalArgumentException(req.getEmail()+"은 이미 회원가입한 이메일입니다.");
+			throw new IllegalArgumentException("회원가입 예외 : "+req.getEmail()+"은 이미 회원가입한 이메일입니다.");
 		}
 	}
 
 	@Transactional(readOnly = true)
 	public SignInResponse signIn(SignInRequest req) {
 		Member member = memberRepository.findByEmail(req.getEmail())
-				.orElseThrow(() -> new IllegalArgumentException("해당 이메일을 찾을 수가 없습니다."));
+				.orElseThrow(() -> new SignInFailureException("해당 이메일을 찾을 수가 없습니다."));
 		validatePassword(req, member);
 		TokenHelper.PrivateClaims privateClaims = createPrivateClaims(member);
 		return new SignInResponse(
@@ -47,7 +47,7 @@ public class AuthService {
 
 	private void validatePassword(SignInRequest req, Member member) {
 		if (!passwordEncoder.matches(req.getPassword(), member.getPassword())) {
-			throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+			throw new SignInFailureException("비밀번호가 일치하지 않습니다.");
 		}
 	}
 
