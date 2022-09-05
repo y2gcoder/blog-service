@@ -12,8 +12,4 @@ import lombok.NoArgsConstructor;
 public class SignUpRequest {
 	private String email;
 	private String password;
-
-	public Member toEntity() {
-		return new Member(email, password, MemberRole.ROLE_USER);
-	}
 }
