@@ -28,7 +28,7 @@ class CategoryRepositoryTest {
 
 	@Test
 	@DisplayName("Category: 저장 실패, 중복 이름")
-	void saveCategory_duplicateName_Fail() {
+	void saveCategory_DuplicateName_Fail() {
 		//given
 		categoryRepository.save(createCategory());
 		//when

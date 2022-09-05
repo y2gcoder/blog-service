@@ -36,7 +36,7 @@ class MemberRepositoryTest {
 
 	@Test
 	@DisplayName("Member: 저장 실패, 중복 이메일")
-	void saveMember_duplicateEmail_Fail() {
+	void saveMember_DuplicateEmail_Fail() {
 		//given
 		memberRepository.save(createMember());
 		//when
