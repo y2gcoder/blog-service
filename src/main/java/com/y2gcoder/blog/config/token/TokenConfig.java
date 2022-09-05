@@ -13,16 +13,16 @@ public class TokenConfig {
 
 	@Bean
 	public TokenHelper accessTokenHelper(
-			@Value("jwt.secret.access") String secret,
-			@Value("jwt.expiry.access") long expirySeconds
+			@Value("${jwt.secret.access}") String secret,
+			@Value("${jwt.expiry.access}") long expirySeconds
 	) {
 		return new TokenHelper(jwtHandler, secret, expirySeconds);
 	}
 
 	@Bean
 	public TokenHelper refreshTokenHelper(
-			@Value("jwt.secret.refresh") String secret,
-			@Value("jwt.expiry.refresh") long expirySeconds
+			@Value("${jwt.secret.refresh}") String secret,
+			@Value("${jwt.expiry.refresh}") long expirySeconds
 	) {
 		return new TokenHelper(jwtHandler, secret, expirySeconds);
 	}
