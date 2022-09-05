@@ -4,6 +4,7 @@ import com.y2gcoder.blog.config.token.TokenHelper;
 import com.y2gcoder.blog.entity.member.Member;
 import com.y2gcoder.blog.entity.member.MemberRole;
 import com.y2gcoder.blog.repository.member.MemberRepository;
+import com.y2gcoder.blog.service.auth.dto.RefreshTokenResponse;
 import com.y2gcoder.blog.service.auth.dto.SignInRequest;
 import com.y2gcoder.blog.service.auth.dto.SignInResponse;
 import com.y2gcoder.blog.service.auth.dto.SignUpRequest;
@@ -115,6 +116,33 @@ class AuthServiceTest {
 		//then
 		assertThatThrownBy(() -> authService.signIn(createSignInRequest()))
 				.isInstanceOf(SignInFailureException.class);
+	}
+	
+	@Test
+	@DisplayName("인증: 토큰 재발급 성공")
+	void refreshAccessToken_Normal_Success() {
+		//given
+		String refreshToken = "refreshToken";
+		String accessToken = "accessToken";
+		given(refreshTokenHelper.parse(refreshToken))
+				.willReturn(Optional.of(new TokenHelper.PrivateClaims("userId", MemberRole.ROLE_USER.toString())));
+		given(accessTokenHelper.createToken(any())).willReturn(accessToken);
+		//when
+		RefreshTokenResponse response = authService.refreshAccessToken(refreshToken);
+		//then
+		assertThat(response.getAccessToken()).isEqualTo(accessToken);
+	}
+
+	@Test
+	@DisplayName("인증: 토큰 재발급 실패, 유효하지 않은 Refresh Token")
+	void refreshAccessToken_InvalidToken_Fail() {
+		//given
+		String refreshToken = "refreshToken";
+		given(refreshTokenHelper.parse(refreshToken)).willReturn(Optional.empty());
+		//when
+		//then
+		assertThatThrownBy(() -> authService.refreshAccessToken(refreshToken))
+				.isInstanceOf(IllegalArgumentException.class);
 	}
 
 	private static Member createMember() {

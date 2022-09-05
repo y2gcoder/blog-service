@@ -2,6 +2,7 @@ package com.y2gcoder.blog.web.auth;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.y2gcoder.blog.service.auth.AuthService;
+import com.y2gcoder.blog.service.auth.dto.RefreshTokenResponse;
 import com.y2gcoder.blog.service.auth.dto.SignInRequest;
 import com.y2gcoder.blog.service.auth.dto.SignInResponse;
 import com.y2gcoder.blog.service.auth.dto.SignUpRequest;
@@ -71,5 +72,21 @@ class AuthControllerTest {
 				.andExpect(jsonPath("$.result.data.refreshToken").value("refresh"));
 
 		verify(authService).signIn(req);
+	}
+
+	@Test
+	@DisplayName("인증: 토큰 리프레시 성공")
+	void tokenRefresh_Normal_Success() throws Exception {
+		//given
+		given(authService.refreshAccessToken("refreshToken"))
+				.willReturn(new RefreshTokenResponse("accessToken"));
+		//when
+		//then
+		mockMvc.perform(
+						post("/api/auth/token-refresh")
+								.header("Authorization", "refreshToken")
+				)
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.result.data.accessToken").value("accessToken"));
 	}
 }

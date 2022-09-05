@@ -18,6 +18,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -96,5 +97,30 @@ public class AuthControllerAdviceTest {
 						.content(objectMapper.writeValueAsString(req))
 				)
 				.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	@DisplayName("토큰 재발급: 실패, 잘못된 토큰")
+	void tokenRefresh_InvalidToken_Fail() throws Exception {
+		//given
+		given(authService.refreshAccessToken(anyString())).willThrow(IllegalArgumentException.class);
+		//when
+		//then
+		mockMvc.perform(
+				post("/api/auth/token-refresh")
+						.header("Authorization", "refreshToken")
+				)
+				.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	@DisplayName("토큰 재발급: 실패, 토큰 누락")
+	void tokenRefresh_MissingRefreshToken_Fail() throws Exception {
+		//given
+		//when
+		//then
+		mockMvc.perform(
+				post("/api/auth/token-refresh")
+		).andExpect(status().isBadRequest());
 	}
 }

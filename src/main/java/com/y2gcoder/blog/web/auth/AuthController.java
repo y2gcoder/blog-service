@@ -30,4 +30,11 @@ public class AuthController {
 	public ApiResponse signIn(@Valid @RequestBody SignInRequest req) {
 		return success(authService.signIn(req));
 	}
+
+	@PostMapping("/token-refresh")
+	@ResponseStatus(HttpStatus.OK)
+	public ApiResponse tokenRefresh(@RequestHeader(value = "Authorization") String refreshToken) {
+		return success(authService.refreshAccessToken(refreshToken));
+	}
+
 }

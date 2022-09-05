@@ -4,6 +4,7 @@ import com.y2gcoder.blog.config.token.TokenHelper;
 import com.y2gcoder.blog.entity.member.Member;
 import com.y2gcoder.blog.entity.member.MemberRole;
 import com.y2gcoder.blog.repository.member.MemberRepository;
+import com.y2gcoder.blog.service.auth.dto.RefreshTokenResponse;
 import com.y2gcoder.blog.service.auth.dto.SignInRequest;
 import com.y2gcoder.blog.service.auth.dto.SignInResponse;
 import com.y2gcoder.blog.service.auth.dto.SignUpRequest;
@@ -43,6 +44,13 @@ public class AuthService {
 				refreshTokenHelper.createToken(privateClaims)
 		);
 
+	}
+
+	public RefreshTokenResponse refreshAccessToken(String refreshToken) {
+		TokenHelper.PrivateClaims privateClaims = refreshTokenHelper
+				.parse(refreshToken).orElseThrow(() -> new IllegalArgumentException("토큰 재발급에 실패했습니다."));
+		String accessToken = accessTokenHelper.createToken(privateClaims);
+		return new RefreshTokenResponse(accessToken);
 	}
 
 	private void validatePassword(SignInRequest req, Member member) {
