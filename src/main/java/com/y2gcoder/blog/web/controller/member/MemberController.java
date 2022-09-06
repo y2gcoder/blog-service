@@ -1,4 +1,4 @@
-package com.y2gcoder.blog.web.member;
+package com.y2gcoder.blog.web.controller.member;
 
 import com.y2gcoder.blog.service.member.MemberService;
 import com.y2gcoder.blog.web.response.ApiResponse;

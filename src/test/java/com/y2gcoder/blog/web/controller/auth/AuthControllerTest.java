@@ -1,4 +1,4 @@
-package com.y2gcoder.blog.web.auth;
+package com.y2gcoder.blog.web.controller.auth;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.y2gcoder.blog.service.auth.AuthService;

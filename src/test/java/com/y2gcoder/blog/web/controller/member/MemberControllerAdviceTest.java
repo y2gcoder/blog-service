@@ -1,6 +1,7 @@
-package com.y2gcoder.blog.web.member;
+package com.y2gcoder.blog.web.controller.member;
 
 import com.y2gcoder.blog.service.member.MemberService;
+import com.y2gcoder.blog.web.advice.ExceptionAdvice;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,13 +12,15 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import static org.mockito.Mockito.verify;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
-class MemberControllerTest {
+public class MemberControllerAdviceTest {
 	@InjectMocks
 	MemberController memberController;
 	@Mock
@@ -27,33 +30,32 @@ class MemberControllerTest {
 
 	@BeforeEach
 	void beforeEach() {
-		mockMvc = MockMvcBuilders.standaloneSetup(memberController).build();
+		mockMvc = MockMvcBuilders.standaloneSetup(memberController).setControllerAdvice(new ExceptionAdvice()).build();
 	}
 
 	@Test
-	@DisplayName("회원: 조회 성공")
-	void find_Normal_Success() throws Exception {
+	@DisplayName("회원: 조회 실패, 회원 없음")
+	void find_NotFoundMember_Fail() throws Exception {
 		//given
-		Long id = 1L;
+		given(memberService.find(anyLong())).willThrow(IllegalArgumentException.class);
 		//when
 		//then
 		mockMvc.perform(
-						get("/api/members/{id}", id)
+				get("/api/members/{id}", 1L)
 				)
-				.andExpect(status().isOk());
-		verify(memberService).find(id);
+				.andExpect(status().isBadRequest());
 	}
 
 	@Test
-	@DisplayName("회원: 삭제 성공")
-	void delete_Normal_Success() throws Exception {
+	@DisplayName("회원: 삭제 실패, 회원 없음")
+	void delete_NotFoundMember_Fail() throws Exception {
 		//given
-		Long id = 1L;
+		doThrow(IllegalArgumentException.class).when(memberService).delete(anyLong());
 		//when
 		//then
 		mockMvc.perform(
-				delete("/api/members/{id}", id)
-		).andExpect(status().isOk());
-		verify(memberService).delete(id);
+				delete("/api/members/{id}", 1L)
+				)
+				.andExpect(status().isBadRequest());
 	}
 }

@@ -1,4 +1,4 @@
-package com.y2gcoder.blog.web.member;
+package com.y2gcoder.blog.web.controller.member;
 
 import com.y2gcoder.blog.entity.member.Member;
 import com.y2gcoder.blog.init.TestInitDB;
