@@ -8,7 +8,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -35,8 +34,10 @@ public class WebSecurityConfigure {
 
 	@Bean
 	public AccessDeniedHandler accessDeniedHandler() {
-		log.warn("accessDeniedHandler");
-		return ((request, response, accessDeniedException) -> response.setStatus(HttpServletResponse.SC_FORBIDDEN));
+		return ((request, response, accessDeniedException) -> {
+			log.warn("accessDeniedHandler");
+			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+		});
 	}
 
 	@Bean
@@ -59,6 +60,7 @@ public class WebSecurityConfigure {
 				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 				.and()
 				.authorizeRequests()
+				.antMatchers("/swagger-ui/**", "/swagger-resources/**", "/v3/api-docs/**").permitAll()
 				.antMatchers(HttpMethod.POST, "/api/auth/sign-up", "/api/auth/sign-in", "/api/auth/token-refresh").permitAll()
 				.antMatchers(HttpMethod.DELETE, "/api/members/{id}/**").authenticated()
 				.antMatchers(HttpMethod.GET, "/api/**").permitAll()
@@ -72,10 +74,5 @@ public class WebSecurityConfigure {
 				.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
 		return http.build();
-	}
-
-	@Bean
-	public WebSecurityCustomizer webSecurityCustomizer() {
-		return (web -> web.ignoring().antMatchers("/swagger-ui/**", "/swagger-resources/**", "/v3/api-docs/**"));
 	}
 }
