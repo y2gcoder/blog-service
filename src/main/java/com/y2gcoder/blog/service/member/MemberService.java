@@ -4,7 +4,6 @@ import com.y2gcoder.blog.entity.member.Member;
 import com.y2gcoder.blog.repository.member.MemberRepository;
 import com.y2gcoder.blog.service.member.dto.MemberDto;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,7 +21,6 @@ public class MemberService {
 	}
 
 	@Transactional
-	@PreAuthorize("@memberGuard.check(#id)")
 	public void delete(Long id) {
 		Member member = memberRepository
 				.findById(id).orElseThrow(() -> new IllegalArgumentException("해당 회원을 찾지 못했습니다. id=" + id));

@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @Api(value = "Member Controller", tags = "Member")
@@ -24,6 +25,7 @@ public class MemberController {
 	}
 
 	@ApiOperation(value = "사용자 정보 삭제", notes = "사용자 정보를 삭제한다. 관리자와 당사자만 가능")
+	@PreAuthorize("@memberGuard.check(#id)")
 	@DeleteMapping("/{id}")
 	@ResponseStatus(HttpStatus.OK)
 	public ApiResponse delete(@ApiParam(value = "사용자 ID", required = true) @PathVariable Long id) {
