@@ -1,4 +1,6 @@
 spring:
+  profiles:
+    include: jwt
   jpa:
     open-in-view: false
     hibernate:
@@ -15,11 +17,3 @@ logging:
     com.y2gcoder.blog: debug
     org.hibernate.sql: info
     org.hibernate.type.descriptor.sql: trace
-
-jwt:
-  secret:
-    access: eTJnY29kZXJibG9nYWNjZXNzdG9rZW55Mmdjb2RlcmJsb2dhY2Nlc3N0b2tlbnkyZ2NvZGVyYmxvZ2FjY2Vzc3Rva2VuCg==
-    refresh: eTJnY29kZXJibG9ncmVmcmVzaHRva2VueTJnY29kZXJibG9ncmVmcmVzaHRva2VueTJnY29kZXJibG9ncmVmcmVzaHRva2VuCg==
-  expiry:
-    access: 3600
-    refresh: 604800
