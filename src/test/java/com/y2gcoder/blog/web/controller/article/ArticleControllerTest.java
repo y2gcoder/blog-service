@@ -15,6 +15,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -52,5 +53,19 @@ class ArticleControllerTest {
 		).andExpect(status().isCreated());
 
 		verify(articleService).create(req);
+	}
+
+	@Test
+	@DisplayName("게시글: 단건 조회 성공")
+	void read_Normal_Success() throws Exception {
+		//given
+		Long id = 1L;
+		//when
+		//then
+		mockMvc.perform(
+				get("/api/articles/{id}", id)
+				)
+				.andExpect(status().isOk());
+		verify(articleService).read(id);
 	}
 }

@@ -16,7 +16,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -77,4 +79,18 @@ public class ArticleControllerAdviceTest {
 				)
 				.andExpect(status().isBadRequest());
 	}
+
+	@Test
+	@DisplayName("게시글: 단건 조회 실패, 게시글 없음")
+	void read_NotFoundArticle_Fail() throws Exception {
+		//given
+		given(articleService.read(anyLong())).willThrow(IllegalArgumentException.class);
+		//when
+		//then
+		mockMvc.perform(
+				get("/api/articles/{id}", 1L)
+		).andExpect(status().isBadRequest());
+	}
+
+
 }

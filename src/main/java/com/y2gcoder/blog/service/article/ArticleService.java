@@ -8,6 +8,7 @@ import com.y2gcoder.blog.repository.category.CategoryRepository;
 import com.y2gcoder.blog.repository.member.MemberRepository;
 import com.y2gcoder.blog.service.article.dto.ArticleCreateRequest;
 import com.y2gcoder.blog.service.article.dto.ArticleCreateResponse;
+import com.y2gcoder.blog.service.article.dto.ArticleDetailResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,5 +33,12 @@ public class ArticleService {
 		Article article = articleRepository
 				.save(new Article(req.getTitle(), req.getContent(), req.getThumbnailUrl(), category, member));
 		return new ArticleCreateResponse(article.getId());
+	}
+
+	public ArticleDetailResponse read(Long id) {
+		return new ArticleDetailResponse(
+				articleRepository.findById(id)
+						.orElseThrow(() -> new IllegalArgumentException("해당 게시글을 찾을 수 없습니다. id=" + id))
+		);
 	}
 }

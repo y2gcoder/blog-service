@@ -8,6 +8,7 @@ import com.y2gcoder.blog.repository.article.ArticleRepository;
 import com.y2gcoder.blog.repository.category.CategoryRepository;
 import com.y2gcoder.blog.repository.member.MemberRepository;
 import com.y2gcoder.blog.service.article.dto.ArticleCreateRequest;
+import com.y2gcoder.blog.service.article.dto.ArticleDetailResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,6 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -74,6 +76,29 @@ class ArticleServiceTest {
 		//when
 		//then
 		assertThatThrownBy(() -> articleService.create(createArticleCreateRequest()))
+				.isInstanceOf(IllegalArgumentException.class);
+	}
+
+	@Test
+	@DisplayName("게시글: 단건 조회 성공")
+	void read_Normal_Success() {
+		//given
+		Article article = new Article("title", "content", "", createCategory(), createMember());
+		given(articleRepository.findById(anyLong())).willReturn(Optional.of(article));
+		//when
+		ArticleDetailResponse result = articleService.read(1L);
+		//then
+		assertThat(result.getTitle()).isEqualTo(article.getTitle());
+	}
+
+	@Test
+	@DisplayName("게시글: 단건 조회 실패, 게시글 없음")
+	void read_NotFoundArticle_Fail() {
+		//given
+		given(articleRepository.findById(anyLong())).willReturn(Optional.empty());
+		//when
+		//then
+		assertThatThrownBy(() -> articleService.read(1L))
 				.isInstanceOf(IllegalArgumentException.class);
 	}
 

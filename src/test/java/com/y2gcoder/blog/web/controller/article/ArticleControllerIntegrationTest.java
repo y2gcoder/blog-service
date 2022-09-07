@@ -27,6 +27,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -60,7 +61,7 @@ public class ArticleControllerIntegrationTest {
 	void beforeEach() {
 		mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
 		initDB.initDB();
-		member = memberRepository.findByEmail(initDB.getMemberEmail1()).orElseThrow(IllegalArgumentException::new);
+		member = memberRepository.findByEmail(initDB.getAdminEmail()).orElseThrow(IllegalArgumentException::new);
 		category = categoryRepository.save(new Category("category"));
 	}
 
@@ -112,5 +113,20 @@ public class ArticleControllerIntegrationTest {
 						.content(objectMapper.writeValueAsString(req))
 				)
 				.andExpect(status().isUnauthorized());
+	}
+
+	@Test
+	@DisplayName("게시글: 단건 조회, 성공")
+	void read_Normal_Success() throws Exception {
+		//given
+		Article article = articleRepository.save(
+				new Article("title", "content", "", category, member)
+		);
+		//when
+		//then
+		mockMvc.perform(
+				get("/api/articles/{id}", article.getId())
+				)
+				.andExpect(status().isOk());
 	}
 }
