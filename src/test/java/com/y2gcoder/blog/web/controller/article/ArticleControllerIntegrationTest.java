@@ -9,6 +9,7 @@ import com.y2gcoder.blog.repository.article.ArticleRepository;
 import com.y2gcoder.blog.repository.category.CategoryRepository;
 import com.y2gcoder.blog.repository.member.MemberRepository;
 import com.y2gcoder.blog.service.article.dto.ArticleCreateRequest;
+import com.y2gcoder.blog.service.article.dto.ArticleUpdateRequest;
 import com.y2gcoder.blog.service.auth.AuthService;
 import com.y2gcoder.blog.service.auth.dto.SignInRequest;
 import com.y2gcoder.blog.service.auth.dto.SignInResponse;
@@ -178,5 +179,76 @@ public class ArticleControllerIntegrationTest {
 			delete("/api/articles/{id}", article.getId())
 					.header("Authorization", signInRes.getAccessToken())
 		).andExpect(status().isForbidden());
+	}
+
+	@Test
+	@DisplayName("게시글: 수정, 성공")
+	void update_Normal_Success() throws Exception {
+		//given
+		Article article = articleRepository
+				.save(new Article("title", "content", "", category, admin));
+		SignInResponse signInRes = authService.signIn(new SignInRequest(admin.getEmail(), initDB.getPassword()));
+		ArticleUpdateRequest req = new ArticleUpdateRequest(
+				"updatedTitle",
+				"updatedContent",
+				"https://images.unsplash.com/photo-1461887046916-c7426e65460d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1974&q=80"
+		);
+		//when
+		//then
+		mockMvc.perform(
+				patch("/api/articles/{id}", article.getId())
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(objectMapper.writeValueAsString(req))
+						.header("Authorization", signInRes.getAccessToken())
+				)
+				.andExpect(status().isOk());
+		Article updatedArticle = articleRepository.findById(article.getId()).orElseThrow(IllegalArgumentException::new);
+		assertThat(updatedArticle.getTitle()).isEqualTo(req.getTitle());
+		assertThat(updatedArticle.getContent()).isEqualTo(req.getContent());
+		assertThat(updatedArticle.getThumbnailUrl()).isEqualTo(req.getThumbnailUrl());
+	}
+
+	@Test
+	@DisplayName("게시글: 수정, 실패, 토큰 없음")
+	void update_NoToken_Fail() throws Exception {
+		//given
+		Article article = articleRepository
+				.save(new Article("title", "content", "", category, admin));
+		ArticleUpdateRequest req = new ArticleUpdateRequest(
+				"updatedTitle",
+				"updatedContent",
+				"https://images.unsplash.com/photo-1461887046916-c7426e65460d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1974&q=80"
+		);
+		//when
+		//then
+		mockMvc.perform(
+						patch("/api/articles/{id}", article.getId())
+								.contentType(MediaType.APPLICATION_JSON)
+								.content(objectMapper.writeValueAsString(req))
+				)
+				.andExpect(status().isUnauthorized());
+	}
+
+	@Test
+	@DisplayName("게시글: 수정, 실패, 일반 사용자")
+	void update_NormalMember_Fail() throws Exception {
+		//given
+		Article article = articleRepository
+				.save(new Article("title", "content", "", category, admin));
+		SignInResponse signInRes = authService.signIn(new SignInRequest(member1.getEmail(), initDB.getPassword()));
+		ArticleUpdateRequest req = new ArticleUpdateRequest(
+				"updatedTitle",
+				"updatedContent",
+				"https://images.unsplash.com/photo-1461887046916-c7426e65460d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1974&q=80"
+		);
+		//when
+		//then
+		mockMvc.perform(
+						patch("/api/articles/{id}", article.getId())
+								.contentType(MediaType.APPLICATION_JSON)
+								.content(objectMapper.writeValueAsString(req))
+								.header("Authorization", signInRes.getAccessToken())
+				)
+				.andExpect(status().isForbidden());
 	}
 }

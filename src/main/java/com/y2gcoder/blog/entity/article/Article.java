@@ -44,4 +44,16 @@ public class Article extends BaseTimeEntity {
 	public void changeCategory(Category category) {
 		this.category = category;
 	}
+
+	public void changeTitle(String title) {
+		this.title = title;
+	}
+
+	public void changeContent(String content) {
+		this.content = content;
+	}
+
+	public void changeThumbnailUrl(String thumbnailUrl) {
+		this.thumbnailUrl = thumbnailUrl;
+	}
 }

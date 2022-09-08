@@ -3,6 +3,7 @@ package com.y2gcoder.blog.web.controller.article;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.y2gcoder.blog.service.article.ArticleService;
 import com.y2gcoder.blog.service.article.dto.ArticleCreateRequest;
+import com.y2gcoder.blog.service.article.dto.ArticleUpdateRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -80,5 +81,21 @@ class ArticleControllerTest {
 				)
 				.andExpect(status().isOk());
 		verify(articleService).delete(id);
+	}
+
+	@Test
+	@DisplayName("게시글: 수정, 성공")
+	void update_Normal_Success() throws Exception {
+		//given
+		Long id = 1L;
+		ArticleUpdateRequest req = new ArticleUpdateRequest("수정제목", "수정내용", "수정썸네일");
+		//when
+		mockMvc.perform(
+			patch("/api/articles/{id}", id)
+					.contentType(MediaType.APPLICATION_JSON)
+					.content(objectMapper.writeValueAsString(req))
+		).andExpect(status().isOk());
+		//then
+		verify(articleService).update(id, req);
 	}
 }

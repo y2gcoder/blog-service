@@ -3,6 +3,7 @@ package com.y2gcoder.blog.web.controller.article;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.y2gcoder.blog.service.article.ArticleService;
 import com.y2gcoder.blog.service.article.dto.ArticleCreateRequest;
+import com.y2gcoder.blog.service.article.dto.ArticleUpdateRequest;
 import com.y2gcoder.blog.web.advice.ExceptionAdvice;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -101,6 +102,25 @@ public class ArticleControllerAdviceTest {
 		//then
 		mockMvc.perform(
 				delete("/api/articles/{id}", 1L)
+				)
+				.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	@DisplayName("게시글: 수정, 실패, 게시글 없음")
+	void update_NotFoundArticle_Fail() throws Exception {
+		//given
+		given(articleService.update(anyLong(), any())).willThrow(IllegalArgumentException.class);
+		//when
+		//then
+		mockMvc.perform(
+				patch("/api/articles/{id}", 1L)
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(objectMapper.writeValueAsString(new ArticleUpdateRequest(
+								"수정제목",
+								"수정내용",
+								"수정썸네일"
+						)))
 				)
 				.andExpect(status().isBadRequest());
 	}

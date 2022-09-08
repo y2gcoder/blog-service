@@ -6,9 +6,7 @@ import com.y2gcoder.blog.entity.member.Member;
 import com.y2gcoder.blog.repository.article.ArticleRepository;
 import com.y2gcoder.blog.repository.category.CategoryRepository;
 import com.y2gcoder.blog.repository.member.MemberRepository;
-import com.y2gcoder.blog.service.article.dto.ArticleCreateRequest;
-import com.y2gcoder.blog.service.article.dto.ArticleCreateResponse;
-import com.y2gcoder.blog.service.article.dto.ArticleDetailResponse;
+import com.y2gcoder.blog.service.article.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,5 +45,15 @@ public class ArticleService {
 		Article article = articleRepository.findById(id)
 				.orElseThrow(() -> new IllegalArgumentException("해당 게시글을 찾을 수 없습니다. id=" + id));
 		articleRepository.delete(article);
+	}
+
+	@Transactional
+	public ArticleUpdateResponse update(Long id, ArticleUpdateRequest req) {
+		Article article = articleRepository.findById(id)
+				.orElseThrow(() -> new IllegalArgumentException("해당 게시글을 찾을 수 없습니다. id=" + id));
+		article.changeTitle(req.getTitle());
+		article.changeContent(req.getContent());
+		article.changeThumbnailUrl(req.getThumbnailUrl());
+		return new ArticleUpdateResponse(id);
 	}
 }

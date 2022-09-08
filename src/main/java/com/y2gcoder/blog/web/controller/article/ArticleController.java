@@ -3,6 +3,7 @@ package com.y2gcoder.blog.web.controller.article;
 import com.y2gcoder.blog.annotation.AssignMemberId;
 import com.y2gcoder.blog.service.article.ArticleService;
 import com.y2gcoder.blog.service.article.dto.ArticleCreateRequest;
+import com.y2gcoder.blog.service.article.dto.ArticleUpdateRequest;
 import com.y2gcoder.blog.web.response.ApiResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -44,5 +45,15 @@ public class ArticleController {
 	public ApiResponse delete(@ApiParam(value = "게시글 ID", required = true) @PathVariable Long id) {
 		articleService.delete(id);
 		return success();
+	}
+
+	@ApiOperation(value = "게시글 수정", notes = "게시글 수정한다.")
+	@PatchMapping("/{id}")
+	@ResponseStatus(OK)
+	public ApiResponse update(
+			@ApiParam(value = "게시글 ID", required = true) @PathVariable Long id,
+			@Valid @RequestBody ArticleUpdateRequest req
+			) {
+		return success(articleService.update(id, req));
 	}
 }

@@ -9,6 +9,7 @@ import com.y2gcoder.blog.repository.category.CategoryRepository;
 import com.y2gcoder.blog.repository.member.MemberRepository;
 import com.y2gcoder.blog.service.article.dto.ArticleCreateRequest;
 import com.y2gcoder.blog.service.article.dto.ArticleDetailResponse;
+import com.y2gcoder.blog.service.article.dto.ArticleUpdateRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -122,6 +123,41 @@ class ArticleServiceTest {
 		//when
 		//then
 		assertThatThrownBy(() -> articleService.delete(1L))
+				.isInstanceOf(IllegalArgumentException.class);
+	}
+
+	@Test
+	@DisplayName("게시글: 수정, 성공")
+	void update_Normal_Success() {
+		//given
+		Article article = new Article(
+				"title",
+				"content",
+				"1",
+				createCategory(),
+				createMember()
+		);
+		given(articleRepository.findById(anyLong())).willReturn(Optional.of(article));
+		ArticleUpdateRequest req = new ArticleUpdateRequest("제목", "내용", "2");
+		//when
+		articleService.update(1L, req);
+		//then
+		assertThat(article.getTitle()).isEqualTo(req.getTitle());
+		assertThat(article.getContent()).isEqualTo(req.getContent());
+		assertThat(article.getThumbnailUrl()).isEqualTo(req.getThumbnailUrl());
+	}
+
+	@Test
+	@DisplayName("게시글: 수정, 실패, 게시글 없음")
+	void update_NotFoundArticle_Fail() {
+		//given
+		given(articleRepository.findById(anyLong())).willReturn(Optional.empty());
+		//when
+		//then
+		assertThatThrownBy(() -> articleService.update(
+				1L,
+				new ArticleUpdateRequest("제목", "내용", "2")
+		))
 				.isInstanceOf(IllegalArgumentException.class);
 	}
 
