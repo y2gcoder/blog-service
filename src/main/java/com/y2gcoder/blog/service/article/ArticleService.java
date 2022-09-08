@@ -41,4 +41,11 @@ public class ArticleService {
 						.orElseThrow(() -> new IllegalArgumentException("해당 게시글을 찾을 수 없습니다. id=" + id))
 		);
 	}
+
+	@Transactional
+	public void delete(Long id) {
+		Article article = articleRepository.findById(id)
+				.orElseThrow(() -> new IllegalArgumentException("해당 게시글을 찾을 수 없습니다. id=" + id));
+		articleRepository.delete(article);
+	}
 }

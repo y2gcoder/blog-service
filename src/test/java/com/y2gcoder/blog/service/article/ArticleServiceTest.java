@@ -102,6 +102,29 @@ class ArticleServiceTest {
 				.isInstanceOf(IllegalArgumentException.class);
 	}
 
+	@Test
+	@DisplayName("게시글: 삭제 성공")
+	void delete_Normal_Success() {
+		//given
+		Article article = new Article("title", "content", "", createCategory(), createMember());
+		given(articleRepository.findById(anyLong())).willReturn(Optional.of(article));
+		//when
+	  articleService.delete(1L);
+		//then
+		verify(articleRepository).delete(any());
+	}
+
+	@Test
+	@DisplayName("게시글: 삭제 실패, 게시글 없음")
+	void delete_NotFoundArticle_Fail() {
+		//given
+		given(articleRepository.findById(anyLong())).willReturn(Optional.empty());
+		//when
+		//then
+		assertThatThrownBy(() -> articleService.delete(1L))
+				.isInstanceOf(IllegalArgumentException.class);
+	}
+
 	private static ArticleCreateRequest createArticleCreateRequest() {
 		return new ArticleCreateRequest(
 				"my title",

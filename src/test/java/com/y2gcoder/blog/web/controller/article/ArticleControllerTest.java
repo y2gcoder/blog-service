@@ -15,8 +15,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import static org.mockito.Mockito.verify;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
@@ -67,5 +66,19 @@ class ArticleControllerTest {
 				)
 				.andExpect(status().isOk());
 		verify(articleService).read(id);
+	}
+
+	@Test
+	@DisplayName("게시글: 삭제 성공")
+	void delete_Normal_Success() throws Exception {
+		//given
+		Long id = 1L;
+		//when
+		//then
+		mockMvc.perform(
+				delete("/api/articles/{id}", id)
+				)
+				.andExpect(status().isOk());
+		verify(articleService).delete(id);
 	}
 }

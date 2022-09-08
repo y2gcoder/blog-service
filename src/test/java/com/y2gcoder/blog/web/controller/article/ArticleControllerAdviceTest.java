@@ -18,8 +18,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.mockito.Mockito.doThrow;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
@@ -92,5 +92,17 @@ public class ArticleControllerAdviceTest {
 		).andExpect(status().isBadRequest());
 	}
 
+	@Test
+	@DisplayName("게시글: 삭제 실패, 게시글 없음")
+	void delete_NotFoundArticle_Fail() throws Exception {
+		//given
+		doThrow(IllegalArgumentException.class).when(articleService).delete(anyLong());
+		//when
+		//then
+		mockMvc.perform(
+				delete("/api/articles/{id}", 1L)
+				)
+				.andExpect(status().isBadRequest());
+	}
 
 }

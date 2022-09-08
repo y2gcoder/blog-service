@@ -26,9 +26,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ActiveProfiles(value = "test")
@@ -54,14 +54,18 @@ public class ArticleControllerIntegrationTest {
 	AuthService authService;
 
 	ObjectMapper objectMapper = new ObjectMapper();
-	Member member;
+	Member admin;
+	Member member1;
+	Member member2;
 	Category category;
 
 	@BeforeEach
 	void beforeEach() {
 		mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
 		initDB.initDB();
-		member = memberRepository.findByEmail(initDB.getAdminEmail()).orElseThrow(IllegalArgumentException::new);
+		admin = memberRepository.findByEmail(initDB.getAdminEmail()).orElseThrow(IllegalArgumentException::new);
+		member1 = memberRepository.findByEmail(initDB.getMemberEmail1()).orElseThrow(IllegalArgumentException::new);
+		member2 = memberRepository.findByEmail(initDB.getMemberEmail2()).orElseThrow(IllegalArgumentException::new);
 		category = categoryRepository.save(new Category("category"));
 	}
 
@@ -69,7 +73,7 @@ public class ArticleControllerIntegrationTest {
 	@DisplayName("게시글: 생성 성공")
 	void create_Normal_Success() throws Exception {
 		//given
-		SignInResponse signInRes = authService.signIn(new SignInRequest(member.getEmail(), initDB.getPassword()));
+		SignInResponse signInRes = authService.signIn(new SignInRequest(admin.getEmail(), initDB.getPassword()));
 		ArticleCreateRequest req = new ArticleCreateRequest(
 				"title",
 				"content",
@@ -91,7 +95,7 @@ public class ArticleControllerIntegrationTest {
 		assertThat(result.getTitle()).isEqualTo("title");
 		assertThat(result.getContent()).isEqualTo("content");
 		assertThat(result.getThumbnailUrl()).isEqualTo("");
-		assertThat(result.getMember().getId()).isEqualTo(member.getId());
+		assertThat(result.getMember().getId()).isEqualTo(admin.getId());
 	}
 
 	@Test
@@ -120,7 +124,7 @@ public class ArticleControllerIntegrationTest {
 	void read_Normal_Success() throws Exception {
 		//given
 		Article article = articleRepository.save(
-				new Article("title", "content", "", category, member)
+				new Article("title", "content", "", category, admin)
 		);
 		//when
 		//then
@@ -128,5 +132,51 @@ public class ArticleControllerIntegrationTest {
 				get("/api/articles/{id}", article.getId())
 				)
 				.andExpect(status().isOk());
+	}
+
+	@Test
+	@DisplayName("게시글: 삭제, 성공")
+	void delete_Normal_Success() throws Exception {
+		//given
+		Article article = articleRepository
+				.save(new Article("title", "content", null, category, admin));
+		SignInResponse signInRes = authService.signIn(new SignInRequest(admin.getEmail(), initDB.getPassword()));
+		//when
+		//then
+		mockMvc.perform(
+				delete("/api/articles/{id}", article.getId())
+						.header("Authorization", signInRes.getAccessToken())
+		).andExpect(status().isOk());
+
+		assertThatThrownBy(() -> articleRepository.findById(article.getId()).orElseThrow(IllegalArgumentException::new))
+				.isInstanceOf(IllegalArgumentException.class);
+	}
+
+	@Test
+	@DisplayName("게시글: 삭제, 실패, 토큰 없음")
+	void delete_NoToken_Fail() throws Exception {
+		//given
+		Article article = articleRepository
+				.save(new Article("title", "content", null, category, admin));
+		//when
+		//then
+		mockMvc.perform(
+				delete("/api/articles/{id}", article.getId())
+		).andExpect(status().isUnauthorized());
+	}
+
+	@Test
+	@DisplayName("게시글: 삭제, 실패, 일반 사용자")
+	void delete_NormalMember_Fail() throws Exception {
+		//given
+		Article article = articleRepository
+				.save(new Article("title", "content", null, category, admin));
+		SignInResponse signInRes = authService.signIn(new SignInRequest(member1.getEmail(), initDB.getPassword()));
+		//when
+		//then
+		mockMvc.perform(
+			delete("/api/articles/{id}", article.getId())
+					.header("Authorization", signInRes.getAccessToken())
+		).andExpect(status().isForbidden());
 	}
 }

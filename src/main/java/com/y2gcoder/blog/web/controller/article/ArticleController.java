@@ -37,4 +37,12 @@ public class ArticleController {
 	public ApiResponse read(@ApiParam(value = "게시글 ID", required = true) @PathVariable Long id) {
 		return success(articleService.read(id));
 	}
+
+	@ApiOperation(value = "게시글 삭제", notes = "게시글 삭제")
+	@DeleteMapping("/{id}")
+	@ResponseStatus(OK)
+	public ApiResponse delete(@ApiParam(value = "게시글 ID", required = true) @PathVariable Long id) {
+		articleService.delete(id);
+		return success();
+	}
 }
