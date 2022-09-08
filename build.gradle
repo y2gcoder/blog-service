@@ -29,6 +29,10 @@ dependencies {
 	//Swagger
 	implementation 'io.springfox:springfox-boot-starter:3.0.0'
 
+	//QueryDSL
+	implementation("com.querydsl:querydsl-core")
+	implementation("com.querydsl:querydsl-jpa")
+
 	compileOnly 'org.projectlombok:lombok'
 
 	runtimeOnly 'com.h2database:h2'
@@ -40,6 +44,10 @@ dependencies {
 	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 
 	annotationProcessor 'org.projectlombok:lombok'
+	//QueryDSL
+	annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jpa"
+	annotationProcessor("jakarta.persistence:jakarta.persistence-api")
+	annotationProcessor("jakarta.annotation:jakarta.annotation-api")
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
@@ -49,4 +57,12 @@ dependencies {
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+clean {
+	delete file('src/main/generated')
+}
+
+task cleanGeneatedDir(type: Delete) {
+	delete file('src/main/generated')
 }
