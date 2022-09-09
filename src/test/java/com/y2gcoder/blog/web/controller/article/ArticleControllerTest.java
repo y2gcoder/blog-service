@@ -1,6 +1,7 @@
 package com.y2gcoder.blog.web.controller.article;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.y2gcoder.blog.repository.article.ArticleSearchCondition;
 import com.y2gcoder.blog.service.article.ArticleService;
 import com.y2gcoder.blog.service.article.dto.ArticleCreateRequest;
 import com.y2gcoder.blog.service.article.dto.ArticleUpdateRequest;
@@ -97,5 +98,25 @@ class ArticleControllerTest {
 		).andExpect(status().isOk());
 		//then
 		verify(articleService).update(id, req);
+	}
+
+	@Test
+	@DisplayName("게시글: 목록 조회, 성공")
+	void readAll_Normal_Success() throws Exception {
+		//given
+		ArticleSearchCondition cond = new ArticleSearchCondition(
+				10,
+				null,
+				null,
+				null
+		);
+		//when
+		mockMvc.perform(
+				get("/api/articles")
+						.param("size", String.valueOf(cond.getSize()))
+				)
+				.andExpect(status().isOk());
+		//then
+		verify(articleService).readAll(cond);
 	}
 }

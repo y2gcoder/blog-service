@@ -3,7 +3,9 @@ package com.y2gcoder.blog.service.article;
 import com.y2gcoder.blog.entity.article.Article;
 import com.y2gcoder.blog.entity.category.Category;
 import com.y2gcoder.blog.entity.member.Member;
+import com.y2gcoder.blog.repository.article.ArticleQueryRepository;
 import com.y2gcoder.blog.repository.article.ArticleRepository;
+import com.y2gcoder.blog.repository.article.ArticleSearchCondition;
 import com.y2gcoder.blog.repository.category.CategoryRepository;
 import com.y2gcoder.blog.repository.member.MemberRepository;
 import com.y2gcoder.blog.service.article.dto.*;
@@ -18,6 +20,7 @@ public class ArticleService {
 	private final ArticleRepository articleRepository;
 	private final MemberRepository memberRepository;
 	private final CategoryRepository categoryRepository;
+	private final ArticleQueryRepository articleQueryRepository;
 
 	@Transactional
 	public ArticleCreateResponse create(ArticleCreateRequest req) {
@@ -55,5 +58,9 @@ public class ArticleService {
 		article.changeContent(req.getContent());
 		article.changeThumbnailUrl(req.getThumbnailUrl());
 		return new ArticleUpdateResponse(id);
+	}
+
+	public ArticleListResponse readAll(ArticleSearchCondition condition) {
+		return new ArticleListResponse(articleQueryRepository.findAllByCondition(condition));
 	}
 }

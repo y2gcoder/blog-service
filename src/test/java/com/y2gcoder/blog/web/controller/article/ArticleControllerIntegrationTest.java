@@ -251,4 +251,17 @@ public class ArticleControllerIntegrationTest {
 				)
 				.andExpect(status().isForbidden());
 	}
+
+	@Test
+	@DisplayName("게시글: 목록 조회, 성공")
+	void readAll_Normal_Success() throws Exception {
+		//given
+		//when
+		//then
+		mockMvc.perform(
+				get("/api/articles")
+						.param("size", "10")
+						.param("categoryId", String.valueOf(category.getId()))
+		).andExpect(status().isOk());
+	}
 }

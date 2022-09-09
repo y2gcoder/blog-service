@@ -1,9 +1,11 @@
 package com.y2gcoder.blog.web.controller.article;
 
 import com.y2gcoder.blog.annotation.AssignMemberId;
+import com.y2gcoder.blog.repository.article.ArticleSearchCondition;
 import com.y2gcoder.blog.service.article.ArticleService;
 import com.y2gcoder.blog.service.article.dto.ArticleCreateRequest;
 import com.y2gcoder.blog.service.article.dto.ArticleUpdateRequest;
+import com.y2gcoder.blog.web.controller.article.dto.ArticleReadAllRequest;
 import com.y2gcoder.blog.web.response.ApiResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -55,5 +57,23 @@ public class ArticleController {
 			@Valid @RequestBody ArticleUpdateRequest req
 			) {
 		return success(articleService.update(id, req));
+	}
+
+	@ApiOperation(value = "게시글 목록 조회", notes = "조건을 가지고 게시글 목록을 조회한다.")
+	@GetMapping
+	@ResponseStatus(OK)
+	public ApiResponse readAll(
+			@Valid ArticleReadAllRequest req
+	) {
+		return success(
+				articleService.readAll(
+						new ArticleSearchCondition(
+								req.getSize(),
+								req.getCategoryId(),
+								req.getLastArticleId(),
+								req.getSearchText()
+						)
+				)
+		);
 	}
 }

@@ -4,11 +4,14 @@ import com.y2gcoder.blog.entity.article.Article;
 import com.y2gcoder.blog.entity.category.Category;
 import com.y2gcoder.blog.entity.member.Member;
 import com.y2gcoder.blog.entity.member.MemberRole;
+import com.y2gcoder.blog.repository.article.ArticleQueryRepository;
 import com.y2gcoder.blog.repository.article.ArticleRepository;
+import com.y2gcoder.blog.repository.article.ArticleSearchCondition;
 import com.y2gcoder.blog.repository.category.CategoryRepository;
 import com.y2gcoder.blog.repository.member.MemberRepository;
 import com.y2gcoder.blog.service.article.dto.ArticleCreateRequest;
 import com.y2gcoder.blog.service.article.dto.ArticleDetailResponse;
+import com.y2gcoder.blog.service.article.dto.ArticleListResponse;
 import com.y2gcoder.blog.service.article.dto.ArticleUpdateRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,6 +19,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
 
 import java.util.Optional;
 
@@ -35,6 +39,9 @@ class ArticleServiceTest {
 	MemberRepository memberRepository;
 	@Mock
 	CategoryRepository categoryRepository;
+
+	@Mock
+	ArticleQueryRepository articleQueryRepository;
 
 	@Test
 	@DisplayName("게시글: 생성 성공")
@@ -159,6 +166,22 @@ class ArticleServiceTest {
 				new ArticleUpdateRequest("제목", "내용", "2")
 		))
 				.isInstanceOf(IllegalArgumentException.class);
+	}
+	
+	@Test
+	@DisplayName("게시글: 목록 조회, 성공")
+	void readAll_Normal_Success() {
+		//given
+		given(articleQueryRepository.findAllByCondition(any())).willReturn(Page.empty());
+		//when
+		ArticleListResponse result = articleService.readAll(new ArticleSearchCondition(
+				1,
+				null,
+				null,
+				null
+		));
+		//then
+		assertThat(result.getContent().size()).isZero();
 	}
 
 	private static ArticleCreateRequest createArticleCreateRequest() {
