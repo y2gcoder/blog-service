@@ -9,6 +9,7 @@ import com.y2gcoder.blog.repository.article.ArticleRepository;
 import com.y2gcoder.blog.repository.comment.CommentRepository;
 import com.y2gcoder.blog.repository.member.MemberRepository;
 import com.y2gcoder.blog.service.comment.dto.CommentCreateRequest;
+import com.y2gcoder.blog.service.comment.dto.CommentUpdateRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,6 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -99,6 +101,36 @@ class CommentServiceTest {
 		//then
 		assertThatThrownBy(() -> commentService.delete(1L))
 				.isInstanceOf(IllegalArgumentException.class);
+	}
+
+	@Test
+	@DisplayName("댓글: 수정, 성공")
+	void update_Normal_Success() {
+		//given
+		Comment comment = new Comment(
+				"comment",
+				createMember(),
+				createArticle()
+		);
+		given(commentRepository.findById(anyLong())).willReturn(Optional.of(comment));
+		CommentUpdateRequest req = new CommentUpdateRequest("수정댓글");
+		//when
+		commentService.update(1L, req);
+		//then
+		assertThat(comment.getContent()).isEqualTo(req.getContent());
+	}
+
+	@Test
+	@DisplayName("댓글: 수정, 실패, 댓글 없음")
+	void update_NotFoundComment_Fail() {
+		//given
+		given(commentRepository.findById(anyLong())).willReturn(Optional.empty());
+		//when
+		//then
+		assertThatThrownBy(() -> commentService.update(
+				1L,
+				new CommentUpdateRequest("수정댓글")
+		)).isInstanceOf(IllegalArgumentException.class);
 	}
 
 	private static CommentCreateRequest createCommentCreateRequest() {

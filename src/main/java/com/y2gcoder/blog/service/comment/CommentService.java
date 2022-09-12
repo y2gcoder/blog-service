@@ -8,6 +8,8 @@ import com.y2gcoder.blog.repository.comment.CommentRepository;
 import com.y2gcoder.blog.repository.member.MemberRepository;
 import com.y2gcoder.blog.service.comment.dto.CommentCreateRequest;
 import com.y2gcoder.blog.service.comment.dto.CommentCreateResponse;
+import com.y2gcoder.blog.service.comment.dto.CommentUpdateRequest;
+import com.y2gcoder.blog.service.comment.dto.CommentUpdateResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,5 +39,13 @@ public class CommentService {
 		Comment comment = commentRepository.findById(id)
 				.orElseThrow(() -> new IllegalArgumentException("해당 댓글을 찾을 수 없습니다. id=" + id));
 		commentRepository.delete(comment);
+	}
+
+	@Transactional
+	public CommentUpdateResponse update(Long id, CommentUpdateRequest req) {
+		Comment comment = commentRepository.findById(id)
+				.orElseThrow(() -> new IllegalArgumentException("해당 댓글을 찾을 수 없습니다. id=" + id));
+		comment.updateContent(req.getContent());
+		return new CommentUpdateResponse(id);
 	}
 }

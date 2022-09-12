@@ -3,6 +3,7 @@ package com.y2gcoder.blog.web.controller.comment;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.y2gcoder.blog.service.comment.CommentService;
 import com.y2gcoder.blog.service.comment.dto.CommentCreateRequest;
+import com.y2gcoder.blog.service.comment.dto.CommentUpdateRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,8 +16,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import static org.mockito.Mockito.verify;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
@@ -67,5 +67,22 @@ class CommentControllerTest {
 				)
 				.andExpect(status().isOk());
 		verify(commentService).delete(id);
+	}
+
+	@Test
+	@DisplayName("댓글: 수정, 성공")
+	void update_Normal_Success() throws Exception {
+		//given
+		Long id = 1L;
+		CommentUpdateRequest req = new CommentUpdateRequest("수정댓글");
+		//when
+		//then
+		mockMvc.perform(
+				patch("/api/comments/{id}", id)
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(objectMapper.writeValueAsString(req))
+				)
+				.andExpect(status().isOk());
+		verify(commentService).update(id, req);
 	}
 }

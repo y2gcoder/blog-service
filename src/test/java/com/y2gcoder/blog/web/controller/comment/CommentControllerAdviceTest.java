@@ -3,6 +3,7 @@ package com.y2gcoder.blog.web.controller.comment;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.y2gcoder.blog.service.comment.CommentService;
 import com.y2gcoder.blog.service.comment.dto.CommentCreateRequest;
+import com.y2gcoder.blog.service.comment.dto.CommentUpdateRequest;
 import com.y2gcoder.blog.web.advice.ExceptionAdvice;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -19,8 +20,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
@@ -86,6 +86,23 @@ public class CommentControllerAdviceTest {
 		//then
 		mockMvc.perform(
 				delete("/api/comments/{id}", 1L)
+				)
+				.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	@DisplayName("댓글: 수정, 실패, 댓글 없음")
+	void update_NotFoundComment_Fail() throws Exception {
+		//given
+		given(commentService.update(anyLong(), any())).willThrow(IllegalArgumentException.class);
+		//when
+		//then
+		mockMvc.perform(
+				patch("/api/comments/{id}", 1L)
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(objectMapper.writeValueAsString(
+								new CommentUpdateRequest("수정댓글")
+						))
 				)
 				.andExpect(status().isBadRequest());
 	}

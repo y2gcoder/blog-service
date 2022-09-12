@@ -3,6 +3,7 @@ package com.y2gcoder.blog.web.controller.comment;
 import com.y2gcoder.blog.annotation.AssignMemberId;
 import com.y2gcoder.blog.service.comment.CommentService;
 import com.y2gcoder.blog.service.comment.dto.CommentCreateRequest;
+import com.y2gcoder.blog.service.comment.dto.CommentUpdateRequest;
 import com.y2gcoder.blog.web.response.ApiResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -39,5 +40,16 @@ public class CommentController {
 	public ApiResponse delete(@ApiParam(value = "댓글 ID", required = true) @PathVariable Long id) {
 		commentService.delete(id);
 		return success();
+	}
+
+	@ApiOperation(value = "댓글 수정", notes = "댓글 수정")
+	@PreAuthorize("@commentGuard.check(#id)")
+	@PatchMapping("/{id}")
+	@ResponseStatus(OK)
+	public ApiResponse update(
+			@ApiParam(value = "댓글 ID", required = true) @PathVariable Long id,
+			@Valid @RequestBody CommentUpdateRequest req
+			) {
+			return success(commentService.update(id, req));
 	}
 }
