@@ -16,7 +16,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doThrow;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -70,6 +73,19 @@ public class CommentControllerAdviceTest {
 						post("/api/comments")
 								.contentType(MediaType.APPLICATION_JSON)
 								.content(objectMapper.writeValueAsString(req))
+				)
+				.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	@DisplayName("댓글: 삭제, 실패, 댓글 없음")
+	void delete_NotFoundComment_Fail() throws Exception {
+		//given
+		doThrow(IllegalArgumentException.class).when(commentService).delete(anyLong());
+		//when
+		//then
+		mockMvc.perform(
+				delete("/api/comments/{id}", 1L)
 				)
 				.andExpect(status().isBadRequest());
 	}

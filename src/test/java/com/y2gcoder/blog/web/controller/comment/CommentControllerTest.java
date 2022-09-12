@@ -15,6 +15,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -52,5 +53,19 @@ class CommentControllerTest {
 				.andExpect(status().isCreated());
 
 		verify(commentService).create(req);
+	}
+
+	@Test
+	@DisplayName("댓글: 삭제, 성공")
+	void delete_Normal_Success() throws Exception {
+		//given
+		Long id = 1L;
+		//when
+		//then
+		mockMvc.perform(
+				delete("/api/comments/{id}", id)
+				)
+				.andExpect(status().isOk());
+		verify(commentService).delete(id);
 	}
 }

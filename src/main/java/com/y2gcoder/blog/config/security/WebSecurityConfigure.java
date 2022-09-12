@@ -70,6 +70,7 @@ public class WebSecurityConfigure {
 				.antMatchers(HttpMethod.DELETE, "/api/articles/{id}").hasRole("ADMIN")
 				.antMatchers(HttpMethod.PATCH, "/api/articles/{id}").hasRole("ADMIN")
 				.antMatchers(HttpMethod.POST, "/api/comments").authenticated()
+				.antMatchers(HttpMethod.DELETE, "/api/comments/{id}").authenticated()
 				.anyRequest().hasAnyRole("ADMIN")
 //				.anyRequest().hasAnyRole("ADMIN")
 				.and()

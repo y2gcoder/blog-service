@@ -77,6 +77,30 @@ class CommentServiceTest {
 				.isInstanceOf(IllegalArgumentException.class);
 	}
 
+	@Test
+	@DisplayName("댓글: 삭제, 성공")
+	void delete_Normal_Success() {
+		//given
+		Comment comment = new Comment("댓글", createMember(), createArticle());
+		given(commentRepository.findById(anyLong())).willReturn(Optional.of(comment));
+		//when
+		commentService.delete(1L);
+		//then
+		verify(commentRepository).delete(any());
+	}
+
+	@Test
+	@DisplayName("댓글: 삭제, 실패, 댓글 없음")
+	void delete_NotFoundComment_Fail() {
+		//given
+		given(commentRepository.findById(anyLong()))
+				.willReturn(Optional.empty());
+		//when
+		//then
+		assertThatThrownBy(() -> commentService.delete(1L))
+				.isInstanceOf(IllegalArgumentException.class);
+	}
+
 	private static CommentCreateRequest createCommentCreateRequest() {
 		return new CommentCreateRequest("content", 1L, 1L);
 	}

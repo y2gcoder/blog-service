@@ -31,6 +31,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -116,5 +117,62 @@ public class CommentControllerIntegrationTest {
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(objectMapper.writeValueAsString(req))
 		).andExpect(status().isUnauthorized());
+	}
+
+	@Test
+	@DisplayName("댓글: 삭제, 성공, 자원소유자")
+	void delete_Normal_Success() throws Exception {
+		//given
+		Comment comment = commentRepository.save(new Comment("댓글", member1, article));
+		SignInResponse signInRes = authService.signIn(new SignInRequest(member1.getEmail(), initDB.getPassword()));
+		//when
+		//then
+		mockMvc.perform(
+				delete("/api/comments/{id}", comment.getId())
+						.header("Authorization", signInRes.getAccessToken())
+				)
+				.andExpect(status().isOk());
+	}
+
+	@Test
+	@DisplayName("댓글: 삭제, 성공, 관리자")
+	void delete_Admin_Success() throws Exception {
+		Comment comment = commentRepository.save(new Comment("댓글", member1, article));
+		SignInResponse signInRes = authService.signIn(new SignInRequest(admin.getEmail(), initDB.getPassword()));
+		//when
+		//then
+		mockMvc.perform(
+						delete("/api/comments/{id}", comment.getId())
+								.header("Authorization", signInRes.getAccessToken())
+				)
+				.andExpect(status().isOk());
+	}
+
+	@Test
+	@DisplayName("댓글: 삭제, 실패, 토큰 없음")
+	void delete_NoToken_Fail() throws Exception {
+		//given
+		Comment comment = commentRepository.save(new Comment("댓글", member1, article));
+		//when
+		//then
+		mockMvc.perform(
+				delete("/api/comments/{id}", comment.getId())
+				)
+				.andExpect(status().isUnauthorized());
+	}
+
+	@Test
+	@DisplayName("댓글: 삭제, 실패, 관리자 x 자원소유자 x")
+	void delete_NotResourceOwner_Fail() throws Exception {
+		//given
+		Comment comment = commentRepository.save(new Comment("댓글", member1, article));
+		SignInResponse signInRes = authService.signIn(new SignInRequest(member2.getEmail(), initDB.getPassword()));
+		//when
+		//then
+		mockMvc.perform(
+						delete("/api/comments/{id}", comment.getId())
+								.header("Authorization", signInRes.getAccessToken())
+				)
+				.andExpect(status().isForbidden());
 	}
 }
