@@ -14,6 +14,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
@@ -26,6 +29,9 @@ class CommentRepositoryTest {
 	ArticleRepository articleRepository;
 	@Autowired
 	CommentRepository commentRepository;
+
+	@PersistenceContext
+	EntityManager em;
 
 	Category category;
 	Member author;
@@ -49,6 +55,23 @@ class CommentRepositoryTest {
 		commentRepository.save(comment);
 		//then
 		assertThat(commentRepository.findById(comment.getId()).isPresent()).isTrue();
+	}
+
+	@Test
+	@DisplayName("Comment: 내용 수정 성공")
+	void updateContent_Normal_Success() {
+		//given
+		Comment comment = commentRepository.save(new Comment("댓글", commenter, article));
+		em.flush();
+		em.clear();
+		//when
+		Comment findComment = commentRepository.findById(comment.getId()).get();
+		findComment.updateContent("수정댓글");
+		em.flush();
+		em.clear();
+		//then
+		Comment result = commentRepository.findById(comment.getId()).get();
+		assertThat(result.getContent()).isEqualTo("수정댓글");
 	}
 
 	private static Category createCategory() {
