@@ -8,6 +8,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
@@ -23,6 +24,8 @@ public class ArticleQueryRepository {
 	public ArticleQueryRepository(JPAQueryFactory jpaQueryFactory) {
 		this.jpaQueryFactory = jpaQueryFactory;
 	}
+
+	@Transactional(readOnly = true)
 	public Slice<ArticleListDto> findAllByCondition(ArticleSearchCondition condition) {
 		PageRequest pageRequest = PageRequest.of(0, condition.getSize());
 		Long categoryId = condition.getCategoryId();
