@@ -6,9 +6,12 @@ import com.y2gcoder.blog.entity.comment.Comment;
 import com.y2gcoder.blog.entity.member.Member;
 import com.y2gcoder.blog.entity.member.MemberRole;
 import com.y2gcoder.blog.repository.article.ArticleRepository;
+import com.y2gcoder.blog.repository.comment.CommentCondition;
+import com.y2gcoder.blog.repository.comment.CommentQueryRepository;
 import com.y2gcoder.blog.repository.comment.CommentRepository;
 import com.y2gcoder.blog.repository.member.MemberRepository;
 import com.y2gcoder.blog.service.comment.dto.CommentCreateRequest;
+import com.y2gcoder.blog.service.comment.dto.CommentListResponse;
 import com.y2gcoder.blog.service.comment.dto.CommentUpdateRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,6 +19,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
 
 import java.util.Optional;
 
@@ -38,6 +42,9 @@ class CommentServiceTest {
 
 	@Mock
 	MemberRepository memberRepository;
+
+	@Mock
+	CommentQueryRepository commentQueryRepository;
 
 	@Test
 	@DisplayName("댓글: 생성, 성공")
@@ -131,6 +138,19 @@ class CommentServiceTest {
 				1L,
 				new CommentUpdateRequest("수정댓글")
 		)).isInstanceOf(IllegalArgumentException.class);
+	}
+
+	@Test
+	@DisplayName("댓글: 목록 조회, 성공")
+	void readAll_Normal_Success() {
+		//given
+		given(commentQueryRepository.findAllWithCommenter(any())).willReturn(Page.empty());
+		//when
+		CommentCondition condition = new CommentCondition();
+		CommentListResponse result = commentService.readAll(condition);
+		//then
+		assertThat(result.getContent().size()).isZero();
+		verify(commentQueryRepository).findAllWithCommenter(condition);
 	}
 
 	private static CommentCreateRequest createCommentCreateRequest() {

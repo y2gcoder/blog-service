@@ -256,4 +256,17 @@ public class CommentControllerIntegrationTest {
 				)
 				.andExpect(status().isForbidden());
 	}
+
+	@Test
+	@DisplayName("댓글: 목록 조회, 성공")
+	void readAll_Normal_Success() throws Exception {
+		//given
+		//when
+		//then
+		mockMvc.perform(
+			get("/api/comments")
+					.param("size", "10")
+					.param("articleId", String.valueOf(article.getId()))
+		).andExpect(status().isOk());
+	}
 }

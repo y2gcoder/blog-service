@@ -1,9 +1,11 @@
 package com.y2gcoder.blog.web.controller.comment;
 
 import com.y2gcoder.blog.annotation.AssignMemberId;
+import com.y2gcoder.blog.repository.comment.CommentCondition;
 import com.y2gcoder.blog.service.comment.CommentService;
 import com.y2gcoder.blog.service.comment.dto.CommentCreateRequest;
 import com.y2gcoder.blog.service.comment.dto.CommentUpdateRequest;
+import com.y2gcoder.blog.web.controller.comment.dto.CommentReadAllRequest;
 import com.y2gcoder.blog.web.response.ApiResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -51,5 +53,20 @@ public class CommentController {
 			@Valid @RequestBody CommentUpdateRequest req
 			) {
 			return success(commentService.update(id, req));
+	}
+
+	@ApiOperation(value = "댓글 목록 조회", notes = "조건을 가지고 댓글 목록을 조회한다.")
+	@GetMapping
+	@ResponseStatus(OK)
+	public ApiResponse readAll(
+			@Valid CommentReadAllRequest req
+			) {
+		return success(
+				commentService.readAll(new CommentCondition(
+						req.getSize(),
+						req.getArticleId(),
+						req.getLastCommentId()
+				))
+		);
 	}
 }

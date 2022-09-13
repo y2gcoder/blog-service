@@ -4,12 +4,11 @@ import com.y2gcoder.blog.entity.article.Article;
 import com.y2gcoder.blog.entity.comment.Comment;
 import com.y2gcoder.blog.entity.member.Member;
 import com.y2gcoder.blog.repository.article.ArticleRepository;
+import com.y2gcoder.blog.repository.comment.CommentCondition;
+import com.y2gcoder.blog.repository.comment.CommentQueryRepository;
 import com.y2gcoder.blog.repository.comment.CommentRepository;
 import com.y2gcoder.blog.repository.member.MemberRepository;
-import com.y2gcoder.blog.service.comment.dto.CommentCreateRequest;
-import com.y2gcoder.blog.service.comment.dto.CommentCreateResponse;
-import com.y2gcoder.blog.service.comment.dto.CommentUpdateRequest;
-import com.y2gcoder.blog.service.comment.dto.CommentUpdateResponse;
+import com.y2gcoder.blog.service.comment.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +20,7 @@ public class CommentService {
 	private final CommentRepository commentRepository;
 	private final MemberRepository memberRepository;
 	private final ArticleRepository articleRepository;
+	private final CommentQueryRepository commentQueryRepository;
 
 	@Transactional
 	public CommentCreateResponse create(CommentCreateRequest req) {
@@ -47,5 +47,9 @@ public class CommentService {
 				.orElseThrow(() -> new IllegalArgumentException("해당 댓글을 찾을 수 없습니다. id=" + id));
 		comment.updateContent(req.getContent());
 		return new CommentUpdateResponse(id);
+	}
+
+	public CommentListResponse readAll(CommentCondition condition) {
+		return new CommentListResponse(commentQueryRepository.findAllWithCommenter(condition));
 	}
 }
