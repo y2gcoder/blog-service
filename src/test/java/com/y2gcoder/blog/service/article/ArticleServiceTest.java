@@ -174,14 +174,16 @@ class ArticleServiceTest {
 		//given
 		given(articleQueryRepository.findAllByCondition(any())).willReturn(Page.empty());
 		//when
-		ArticleListResponse result = articleService.readAll(new ArticleSearchCondition(
+		ArticleSearchCondition condition = new ArticleSearchCondition(
 				1,
 				null,
 				null,
 				null
-		));
+		);
+		ArticleListResponse result = articleService.readAll(condition);
 		//then
 		assertThat(result.getContent().size()).isZero();
+		verify(articleQueryRepository).findAllByCondition(condition);
 	}
 
 	private static ArticleCreateRequest createArticleCreateRequest() {
