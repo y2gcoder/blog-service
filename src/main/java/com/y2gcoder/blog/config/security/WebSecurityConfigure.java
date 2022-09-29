@@ -63,6 +63,7 @@ public class WebSecurityConfigure {
 				.antMatchers("/swagger-ui/**", "/swagger-resources/**", "/v3/api-docs/**").permitAll()
 				.antMatchers(HttpMethod.POST, "/api/auth/sign-up", "/api/auth/sign-in", "/api/auth/token-refresh").permitAll()
 				.antMatchers(HttpMethod.GET, "/api/**").permitAll()
+				.antMatchers(HttpMethod.OPTIONS, "/api/**").permitAll()
 				.antMatchers(HttpMethod.DELETE, "/api/members/{id}").authenticated()
 				.antMatchers(HttpMethod.POST, "/api/categories").hasRole("ADMIN")
 				.antMatchers(HttpMethod.DELETE, "/api/categories/{id}").hasRole("ADMIN")
